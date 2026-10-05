@@ -1,4 +1,6 @@
-# Agri-market on Render — Blueprint
+# Agri-market — Render Blueprint
+# If Blueprint sync fails, create Postgres + Web Service manually (see README).
+
 databases:
   - name: agri-market-db
     plan: free
@@ -23,7 +25,7 @@ services:
       - key: APP_KEY
         generateValue: true
       - key: APP_URL
-        sync: false
+        value: https://agri-market.onrender.com
       - key: LOG_CHANNEL
         value: stderr
       - key: SESSION_DRIVER
