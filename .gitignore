@@ -1,20 +1,43 @@
-# Laravel backend
-backend/vendor/
-backend/node_modules/
-backend/storage/logs/
-backend/storage/framework/cache/
-backend/storage/framework/sessions/
-backend/storage/framework/views/
-backend/.env
+# Dependencies
+**/node_modules/
+**/vendor/
+.pnp
+.pnp.js
 
-# Frontend (CRITICAL)
-frontend/node_modules/
+# Env & secrets
+**/.env
+**/.env.*
+!**/.env.example
+
+# Build
+**/dist/
+**/build/
 frontend/dist/
-frontend/build/
+backend/public/build/
+backend/public/hot
+backend/storage/*.key
+backend/storage/logs/*
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+!backend/storage/logs/.gitignore
+!backend/storage/framework/cache/.gitignore
+!backend/storage/framework/sessions/.gitignore
+!backend/storage/framework/views/.gitignore
+backend/bootstrap/cache/*.php
+!backend/bootstrap/cache/.gitignore
 
-# OS
+# IDE / OS
+.idea/
+.vscode/
+*.swp
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
+# Tests / coverage
+coverage/
+.phpunit.result.cache
+.env
+**/.env
+node_modules/
+vendor/

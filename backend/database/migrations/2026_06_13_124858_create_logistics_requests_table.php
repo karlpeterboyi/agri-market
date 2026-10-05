@@ -12,9 +12,27 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('logistics_requests', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+    $table->id();
+
+    $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+    $table->foreignId('listing_id')->constrained('product_listings')->cascadeOnDelete();
+
+    $table->foreignId('buyer_id')->constrained('users')->cascadeOnDelete();
+
+    $table->string('pickup_region');
+    $table->string('pickup_district');
+
+    $table->string('delivery_region');
+    $table->string('delivery_district');
+
+    $table->decimal('quantity', 12, 2);
+
+    // core workflow status
+    $table->string('status')->default('pending');
+    // pending | assigned | in_transit | delivered | cancelled
+
+    $table->timestamps();
+});
     }
 
     /**

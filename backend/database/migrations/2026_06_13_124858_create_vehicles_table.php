@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('transporter_id')->constrained()->cascadeOnDelete();
+            $table->string('registration_number');
+            $table->string('vehicle_type'); // truck, pickup, bike
+            $table->decimal('capacity', 12, 2);
+            $table->boolean('available')->default(true);
             $table->timestamps();
         });
     }

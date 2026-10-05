@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+
+body {
+  @apply bg-gray-100 text-gray-900;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+a {
+  @apply text-green-700 hover:text-green-900;
+}
+
+button {
+  @apply transition duration-200;
+}
