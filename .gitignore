@@ -37,7 +37,3 @@ Thumbs.db
 # Tests / coverage
 coverage/
 .phpunit.result.cache
-.env
-**/.env
-node_modules/
-vendor/

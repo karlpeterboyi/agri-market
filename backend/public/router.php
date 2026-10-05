@@ -9,13 +9,11 @@ $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/');
 $root = __DIR__;
 $spa = $root . '/spa';
 
-// Existing file under public (except directory)
 $file = $root . $uri;
 if ($uri !== '/' && is_file($file)) {
-    return false; // serve as-is
+    return false;
 }
 
-// Storage symlink path
 if (str_starts_with($uri, '/storage/')) {
     $path = $root . $uri;
     if (is_file($path)) {
@@ -23,7 +21,6 @@ if (str_starts_with($uri, '/storage/')) {
     }
 }
 
-// API / Sanctum / other Laravel routes
 if (
     str_starts_with($uri, '/api') ||
     str_starts_with($uri, '/sanctum') ||
@@ -34,7 +31,6 @@ if (
     return true;
 }
 
-// SPA static asset
 $spaFile = $spa . $uri;
 if ($uri !== '/' && is_file($spaFile)) {
     $ext = pathinfo($spaFile, PATHINFO_EXTENSION);
@@ -58,7 +54,6 @@ if ($uri !== '/' && is_file($spaFile)) {
     return true;
 }
 
-// SPA index fallback
 $index = $spa . '/index.html';
 if (is_file($index)) {
     header('Content-Type: text/html; charset=UTF-8');
@@ -66,6 +61,5 @@ if (is_file($index)) {
     return true;
 }
 
-// Fallback to Laravel
 require_once $root . '/index.php';
 return true;

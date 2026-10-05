@@ -1,6 +1,4 @@
 # Agri-market on Render — Blueprint
-# Dashboard: New → Blueprint → connect this repo
-
 databases:
   - name: agri-market-db
     plan: free

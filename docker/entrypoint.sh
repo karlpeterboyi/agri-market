@@ -2,7 +2,6 @@
 set -e
 cd /var/www/html
 
-# Render injects PORT
 export PORT="${PORT:-10000}"
 
 if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "base64:" ]; then
@@ -10,7 +9,6 @@ if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "base64:" ]; then
   export APP_KEY=$(php -r "echo 'base64:'.base64_encode(random_bytes(32));")
 fi
 
-# Write runtime env for artisan
 php -r "
 \$env = [
   'APP_NAME' => getenv('APP_NAME') ?: 'Agri-market',
@@ -35,19 +33,16 @@ foreach (\$env as \$k => \$v) { \$lines[] = \$k.'='.\$v; }
 file_put_contents('.env', implode(\"\\n\", \$lines).\"\\n\");
 "
 
-mkdir -p storage/framework/{cache,sessions,views} storage/logs storage/app/public bootstrap/cache
+mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs storage/app/public bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
 php artisan config:clear || true
 php artisan migrate --force || true
 php artisan storage:link || true
 
-# Prefer SPA index for non-API if present
 if [ -f public/spa/index.html ]; then
-  # ensure logo reachable
   cp -n public/spa/logo.png public/logo.png 2>/dev/null || true
 fi
 
 echo "Starting Agri-market on port $PORT"
-# PHP built-in server with router for SPA + API
 exec php -S 0.0.0.0:$PORT -t public public/router.php
