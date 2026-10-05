@@ -7,8 +7,8 @@ COPY frontend/ ./
 ENV VITE_API_URL=
 RUN npm run build
 
-# ---- PHP app ----
-FROM php:8.3-cli-bookworm
+# ---- PHP app (8.4 required by locked symfony/* 8.1) ----
+FROM php:8.4-cli-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git unzip libpq-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev \
@@ -22,8 +22,7 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 COPY backend/composer.json backend/composer.lock* ./
-RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts --optimize-autoloader || \
-    composer install --no-dev --prefer-dist --no-interaction --no-scripts --optimize-autoloader
+RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts --optimize-autoloader
 
 COPY backend/ ./
 COPY --from=frontend /fe/dist ./public/spa
