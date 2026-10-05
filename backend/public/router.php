@@ -1,13 +1,21 @@
 <?php
 /**
  * Router for PHP built-in server on Render:
- * - /api/* and existing PHP → index.php
- * - /storage/* → storage
+ * - /health & /api/health → instant 200 (Render health checks)
+ * - /api/* → Laravel
  * - SPA assets + history fallback → public/spa
  */
 $uri = urldecode(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?? '/');
 $root = __DIR__;
 $spa = $root . '/spa';
+
+// Fast health — do not boot Laravel (avoids deploy timeouts)
+if ($uri === '/health' || $uri === '/api/health' || $uri === '/up') {
+    header('Content-Type: application/json');
+    http_response_code(200);
+    echo json_encode(['ok' => true, 'service' => 'agri-market']);
+    return true;
+}
 
 $file = $root . $uri;
 if ($uri !== '/' && is_file($file)) {
@@ -24,7 +32,6 @@ if (str_starts_with($uri, '/storage/')) {
 if (
     str_starts_with($uri, '/api') ||
     str_starts_with($uri, '/sanctum') ||
-    str_starts_with($uri, '/up') ||
     str_ends_with($uri, '.php')
 ) {
     require_once $root . '/index.php';
