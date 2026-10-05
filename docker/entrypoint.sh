@@ -36,13 +36,23 @@ file_put_contents('.env', implode(\"\\n\", \$lines).\"\\n\");
 mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views storage/logs storage/app/public bootstrap/cache
 chmod -R 775 storage bootstrap/cache
 
-php artisan config:clear || true
-php artisan migrate --force || true
-php artisan storage:link || true
-
 if [ -f public/spa/index.html ]; then
   cp -n public/spa/logo.png public/logo.png 2>/dev/null || true
 fi
 
+# Start server FIRST so Render health checks succeed, then migrate in background
 echo "Starting Agri-market on port $PORT"
-exec php -S 0.0.0.0:$PORT -t public public/router.php
+php -S 0.0.0.0:$PORT -t public public/router.php &
+SERVER_PID=$!
+
+# Give the server a moment
+sleep 1
+
+(
+  php artisan config:clear || true
+  php artisan migrate --force || true
+  php artisan storage:link || true
+  echo "Background migrate/storage done"
+) &
+
+wait $SERVER_PID
