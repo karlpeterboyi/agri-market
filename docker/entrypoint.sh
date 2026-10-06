@@ -40,19 +40,34 @@ if [ -f public/spa/index.html ]; then
   cp -n public/spa/logo.png public/logo.png 2>/dev/null || true
 fi
 
-# Start server FIRST so Render health checks succeed, then migrate in background
 echo "Starting Agri-market on port $PORT"
 php -S 0.0.0.0:$PORT -t public public/router.php &
 SERVER_PID=$!
-
-# Give the server a moment
 sleep 1
 
 (
   php artisan config:clear || true
   php artisan migrate --force || true
   php artisan storage:link || true
-  echo "Background migrate/storage done"
+
+  # Create admin + demo users only if no admin exists yet
+  php artisan tinker --execute="
+    if (!\\App\\Models\\User::where('role','admin')->exists()) {
+      echo 'Seeding users...';
+      (new \\Database\\Seeders\\UserSeeder)->run();
+      try { (new \\Database\\Seeders\\RoleSeeder)->run(); } catch (\\Throwable \$e) {}
+      try { (new \\Database\\Seeders\\PermissionSeeder)->run(); } catch (\\Throwable \$e) {}
+      try { (new \\Database\\Seeders\\SubscriptionPlanSeeder)->run(); } catch (\\Throwable \$e) {}
+      try { (new \\Database\\Seeders\\SubscriptionPriceSeeder)->run(); } catch (\\Throwable \$e) {}
+      try { (new \\Database\\Seeders\\CommodityCategorySeeder)->run(); } catch (\\Throwable \$e) {}
+      try { (new \\Database\\Seeders\\CommoditySeeder)->run(); } catch (\\Throwable \$e) {}
+      echo 'Seed done';
+    } else {
+      echo 'Admin already exists, skip seed';
+    }
+  " || true
+
+  echo "Background migrate/seed done"
 ) &
 
 wait $SERVER_PID
